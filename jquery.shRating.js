@@ -68,19 +68,24 @@
                 b = $('body'),
                 html = "";
 
-            // Get data from html
+            // Get data
             $.each(markup, function(i, m) {
-                if (typeof options[i] == "undefined") {
+                if (typeof opt[i] == "undefined") {
                     var m = $(t).find('[itemprop="' + m + '"]'),
                         a = $(t).attr(i);
                         c = $(t).find('.' + i);
 
+                    // from markup
                     if (m.get(0)) {
                         var a = m.attr('content'),
                             oo = a ? a : m.text();
                         opt[i] = oo ? parseFloat(oo) : 0;
+
+                    // from attribute
                     } else if (a)
                         opt[i] = parseFloat(a);
+
+                    // from inner element with class name as the name of data element
                     else if (c.get(0))
                         opt[i] = parseFloat(c.text());
                 }
@@ -186,6 +191,8 @@
                                         width: (v * opt.starWidth) + "px"
                                     });
                                     $(t).find('.' + opt.cssClass + ' .ratingChoice').detach();
+                                    if (opt.callBack)
+                                        opt.callBack(json);
                                 }
                             },
                             error: function() {
