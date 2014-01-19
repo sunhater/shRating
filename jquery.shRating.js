@@ -1,7 +1,7 @@
 /*!
- * jQuery shRating v1.0-pre1
+ * jQuery shRating v1.0
  * http://jquery.sunhater.com/shRating
- * 2014-01-16
+ * 2014-01-19
  *
  * Copyright (c) 2010-2014 Pavel Tzonkov <sunhater@sunhater.com>
  * Dual licensed under the MIT and GPL licenses.
@@ -14,9 +14,9 @@
                                                 // For auto-detect stars image path (./ prefix).
                                                 // Not important for absolute stars image URL
         o = { // Plugin options
-            best: 5,    // best rating
-            value: 0,   // rating value
-            count: 0,   // rating count
+            best: 5,  // best rating
+            value: 0, // rating value
+            count: 0, // rating count
 
             disabled: false,    // Set to true if user voted already
             ajaxUrl: "",        // AJAX response URL {value} marks rating value
@@ -70,9 +70,9 @@
 
             // Get data
             $.each(markup, function(i, m) {
-                if (typeof opt[i] == "undefined") {
+                if ((typeof options[i] == "undefined")) {
                     var m = $(t).find('[itemprop="' + m + '"]'),
-                        a = $(t).attr(i);
+                        a = $(t).attr(i),
                         c = $(t).find('.' + i);
 
                     // from markup
@@ -91,11 +91,23 @@
                 }
             });
 
-            var st = '<div class="' + opt.cssClass + '"><div class="ratingEmpty"><div class="ratingBar"></div></div></div>';
+            if (typeof opt.stats[Math.ceil(opt.value)] != "undefined") {
+                var w = opt.stats[Math.ceil(opt.value)],
+                    i = "ratingWord";
+                $(t).find('[itemprop="' + i + '"]').html(w);
+                $(t).find('.' + i).html(w);
+            }
+
+            var st = '<div class="' + opt.cssClass + '"><div class="ratingEmpty"><div class="ratingBar"></div></div></div>',
+                exist = $(t).find('div > div.ratingEmpty');
+
+            if (exist.get(0))
+                exist.parent().detach();
+
             if (opt.empty)
-                $(this).html(st);
+                $(t).html(st);
             else
-                $(this).prepend(st);
+                $(t).prepend(st);
 
             // CSS
             var c = "." + opt.cssClass;
@@ -112,29 +124,29 @@
                 else if (b.get(0))
                     b.append(s);
             }
-            $(this).find(c).css({
+            $(t).find(c).css({
                 width: (opt.starWidth * opt.best) + 'px',
                 height: opt.starHeight + 'px'
             });
-            $(this).find(c + " *").css({
+            $(t).find(c + " *").css({
                 height: opt.starHeight + 'px'
             });
-            $(this).find(c + " .ratingEmpty").css({
+            $(t).find(c + " .ratingEmpty").css({
                 backgroundImage: 'url("' + opt.starsImage + '")',
                 width: (opt.starWidth * opt.best) + 'px'
             });
-            $(this).find(c + " .ratingBar").css({
+            $(t).find(c + " .ratingBar").css({
                 backgroundImage: 'url("' + opt.starsImage + '")',
                 width: parseInt(opt.value * opt.starWidth) + "px"
             });
 
             if (!opt.disabled) {
 
-                $(this).find(c + ' .ratingEmpty').append('<div class="ratingChoice"></div>');
+                $(t).find(c + ' .ratingEmpty').append('<div class="ratingChoice"></div>');
                 for (var i = 0; i < opt.best; i++)
-                    $(this).find(c + " .ratingChoice").append('<a href="#">&nbsp;</a>');
+                    $(t).find(c + " .ratingChoice").append('<a href="#">&nbsp;</a>');
 
-                $(this).find(c + " .ratingChoice a").each(function(i, a) {
+                $(t).find(c + " .ratingChoice a").each(function(i, a) {
                     var j = opt.best - i;
                     $(a).css({
                         width: (j * opt.starWidth) + 'px',
@@ -168,10 +180,11 @@
                                 else {
                                     var v = parseFloat(json.value ? json.value : json.rating),
                                         c = parseInt(json.count ? json.count : json.votes),
-                                        w = opt.stats[Math.ceil(v)];
+                                        w = opt.stats[Math.ceil(v)],
                                         updateMarkup = function(id, value) {
-                                            var e = $(t).find('[itemprop="' + (markup[id] ? markup[id] : id) + '"]');
-                                            var c = $(t).find('.' + id);
+                                            var e = $(t).find('[itemprop="' + (markup[id] ? markup[id] : id) + '"]'),
+                                                c = $(t).find('.' + id);
+
                                             if (e.get(0)) {
                                                 if (e.is('[content]'))
                                                     e.attr('content', value);
